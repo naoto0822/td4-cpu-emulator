@@ -4,13 +4,15 @@ pub struct Rom {
 
 impl Rom {
     pub fn new(memories: Vec<u8>) -> Self {
-        Self{
-            memories,
-        }
+        Self { memories }
     }
 
-    pub fn fetch(&self, target: usize) -> u8 {
-        self.memories[target]
+    pub fn fetch(&self, target: u8) -> u8 {
+        self.memories[target as usize]
+    }
+
+    pub fn size(&self) -> u8 {
+        self.memories.len() as u8
     }
 }
 
@@ -20,10 +22,9 @@ mod rom_tests {
 
     #[test]
     fn fetch_memory() {
-        let mut memories = Vec::new();
-        memories.push(0b0000);
+        let memories: Vec<u8> = vec![0b0000];
         let rom = Rom::new(memories);
-        let fetched = rom.fetch(0 as usize);
+        let fetched = rom.fetch(0);
 
         assert_eq!(fetched, 0b0000);
     }
