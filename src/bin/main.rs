@@ -3,12 +3,14 @@ use td4_cpu_emulator::rom::Rom;
 
 fn main() {
     println!("TD4 CPU Emulator");
-    let ops = vec![0b000000];
+    let ops = vec![
+        0b00110001,
+        0b00000001,
+    ];
     let rom = Rom::new(ops);
 
-    let cpu = Cpu::new(rom);
+    let mut cpu = Cpu::new(rom);
     cpu.run();
 
-    // TODO: display
-    println!("{:?}", cpu);
+    cpu.print();
 }

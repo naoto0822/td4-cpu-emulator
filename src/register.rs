@@ -25,4 +25,12 @@ impl Register {
         self.c = 0b0000;
         self.pc = 0b0000;
     }
+
+    pub fn reset_pc(&mut self) {
+        self.pc = 0b0000;
+    }
+
+    pub fn increment_pc(&mut self) {
+        self.pc += 1;
+    }
 }

@@ -23,12 +23,13 @@ impl Cpu {
             port,
         }
     }
+
     // loop
     // 1 fetch op
     // 2 decode op
     // 3 execute
     // 4 count up
-    pub fn run(&self) {
+    pub fn run(&mut self) {
         loop {
             // 1
             let address = self.register.pc;
@@ -42,13 +43,13 @@ impl Cpu {
             let (opcode, im) = self.decode(op);
 
             // 3
-            self.execute(opcode, im);
+            self.execute(&opcode, im);
 
             // 4
-            if &opcode == OpCode::Jmp || &opcode == OpCode::Jnc {
+            if opcode == OpCode::Jmp || opcode == OpCode::Jnc {
                 continue;
             }
-            self.register.pc += 1;
+            self.register.increment_pc();
         }
     }
 
@@ -76,7 +77,7 @@ impl Cpu {
         }
     }
 
-    fn execute(&self, opcode: OpCode, im: u8) {
+    fn execute(&mut self, opcode: &OpCode, im: u8) {
         match opcode {
             OpCode::MovA => self.mov_a(im),
             OpCode::MovB => self.mov_b(im),
@@ -93,29 +94,29 @@ impl Cpu {
         }
     }
 
-    fn mov_a(&self, im: u8) {
+    fn mov_a(&mut self, im: u8) {
         self.register.a = im;
         self.register.c = 0;
     }
 
-    fn mov_b(&self, im: u8) {
+    fn mov_b(&mut self, im: u8) {
         self.register.b = im;
         self.register.c = 0;
     }
 
-    fn mov_ab(&self) {
+    fn mov_ab(&mut self) {
         let b = self.register.b;
         self.register.a = b;
         self.register.c = 0;
     }
 
-    fn mov_ba(&self) {
+    fn mov_ba(&mut self) {
         let a = self.register.a;
         self.register.b = a;
         self.register.c = 0;
     }
 
-    fn add_a(&self, im: u8) {
+    fn add_a(&mut self, im: u8) {
         let a = self.register.a;
         let added = a + im;
         if added > 0x0f {
@@ -126,7 +127,7 @@ impl Cpu {
         self.register.a = shifted;
     }
 
-    fn add_b(&self, im: u8) {
+    fn add_b(&mut self, im: u8) {
         let b = self.register.a;
         let added = b + im;
         if added > 0x0f {
@@ -135,43 +136,52 @@ impl Cpu {
 
         let shifted = added & 0x0f;
         self.register.b = shifted;
-
     }
 
-    fn in_a(&self) {
+    fn in_a(&mut self) {
         let input = self.port.input;
         self.register.a = input;
         self.register.c = 0;
     }
 
-    fn in_b(&self) {
+    fn in_b(&mut self) {
         let input = self.port.input;
         self.register.b = input;
         self.register.c = 0;
     }
 
-    fn out(&self, im: u8) {
+    fn out(&mut self, im: u8) {
         self.port.output = im;
         self.register.c = 0;
     }
 
-    fn out_b(&self) {
+    fn out_b(&mut self) {
         let b = self.register.b;
         self.port.output = b;
         self.register.c = 0;
     }
 
-    fn jmp(&self, im: u8) {
+    fn jmp(&mut self, im: u8) {
         self.register.pc = im;
         self.register.c = 0;
     }
 
-    fn jnc(&self, im: u8) {
+    fn jnc(&mut self, im: u8) {
         if self.register.c == 0 {
             self.register.pc = im;
         } else {
             self.register.pc += 1;
         }
         self.register.c = 0;
+    }
+
+    // TODO: implement Debug trait
+    pub fn print(&self) {
+        println!("Register A: {}", self.register.a);
+        println!("Register B: {}", self.register.b);
+        println!("Register Carry Flag: {}", self.register.c);
+        println!("Register PC: {}", self.register.pc);
+        println!("Port IN: {}", self.port.input);
+        println!("Port Output: {}", self.port.output);
     }
 }
