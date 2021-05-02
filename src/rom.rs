@@ -28,4 +28,13 @@ mod rom_tests {
 
         assert_eq!(fetched, 0b0000);
     }
+
+    #[test]
+    fn fetch_size() {
+        let memories: Vec<u8> = vec![0b0000];
+        let rom = Rom::new(memories);
+        let size = rom.size();
+
+        assert_eq!(size, 1);
+    }
 }
